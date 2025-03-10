@@ -1,0 +1,185 @@
+---
+title: "Introduction à R"
+author: "Pierre Betti"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+# Introduction
+
+Ce document est une introduction aux bases de R.
+
+Les commandes suivantes permettent des définir les paramètres de base du document R markdown :
+```{r setup, include=FALSE} 
+knitr::opts_chunk$set(echo = TRUE) 
+
+# "{r setup, Include=FALSE}" empêche d'afficher la ligne "knitr::opts_chunk$set(echo = TRUE)" après chaque sortie de code 
+
+#"knitr::opts_chunk$set(echo = TRUE)" permet d'afficher les commandes R et leurs sorties
+``` 
+
+
+# 1. Définir son répertoire de travail
+
+Avant d'importer ou d'enregistrer des fichiers, il est important de définir le répertoire de travail.
+
+```{r}
+getwd()  # Affiche le working directory actuel
+setwd("/chemin/vers/votre/dossier")  # Définit un nouveau working directory
+```
+
+
+# 2. Importer des données
+
+R permet d'importer des données à partir de plusieurs formats comme CSV, Excel, ou encore JSON.
+
+```{r}
+# <- NA permet d'introduire un nouvel élément auquel vous allez ensuite donner une valeur
+data <- NA
+# read.csv() permet de lire un fichier CSV et de l'associer à une variable sous forme de data frame
+data <- read.csv("VosDonnes.csv", sep=",", header=TRUE)
+# head() affiche les premières lignes du data frame pour un aperçu rapide
+head(data)
+```
+
+
+# 3. Manipulation de variables et types de données
+
+```{r}
+x <- 5       # attribuer la valeur d'un nombre entier
+y <- 3.2     # attribuer la valeur d'un nombre décimal
+z <- "Hello" # attribuer une valeur non numérique sous forme de caractères
+print(x)  # Affiche la valeur de x
+class(x)  # Vérifie le type de la variable x
+```
+
+
+# 4. Structures de données
+
+## Vecteurs
+
+Un vecteur est une structure de base qui contient plusieurs valeurs du même type.
+
+```{r}
+vec <- c(1, 2, 3, 4, 5)  # Création d'un vecteur
+print(vec)  # Affichage du vecteur
+length(vec)  # Longueur du vecteur
+sum(vec)  # Somme des éléments
+mean(vec)  # Moyenne
+sd(vec)  # Écart-type
+```
+
+## Matrices
+
+Une matrice est une structure en deux dimensions contenant des valeurs du même type.
+
+```{r}
+mat <- matrix(1:9, nrow=3)  # Création d'une matrice 3x3
+print(mat)  # Affichage de la matrice
+```
+
+## Listes
+
+Une liste peut contenir des éléments de types différents.
+
+```{r}
+lst <- list(name="Alice", age=25, scores=c(90, 85, 88))  # Création d'une liste
+print(lst)  # Affichage de la liste
+lst$name  # Accès à un élément de la liste
+```
+
+## Data Frames
+
+Les data frames sont des tableaux de données utilisés pour manipuler des ensembles de données structurés.
+
+```{r}
+df <- data.frame(Nom=c("Alice", "Bob", "Charlie"), Age=c(25, 30, 22), Score=c(90, 85, 88))
+print(df)  # Affichage du data frame
+```
+
+# 5. Exploration de données
+
+```{r}
+data <- mtcars  # Chargement du jeu de données intégré
+head(data)  # Affichage des premières lignes
+tail(data)  # Affichage des dernières lignes
+summary(data)  # Statistiques descriptives
+str(data)  # Structure des données
+```
+
+# 6. Sélection de colonnes et filtrage
+
+```{r}
+data$mpg  # Sélectionner la colonne 'mpg'
+data[data$mpg > 20, ]  # Filtrer les lignes où mpg > 20
+subset(data, mpg > 20 & hp < 150)  # Filtrer selon plusieurs conditions
+```
+
+# 7. Fusionner des bases de données
+
+Lorsque nous avons plusieurs jeux de données contenant des informations complémentaires, nous pouvons les fusionner avec `merge()`.
+
+```{r}
+# Création de deux data frames
+df1 <- data.frame(ID = c(1, 2, 3), Nom = c("Alice", "Bob", "Charlie"), Score = c(90, 85, 88))
+df2 <- data.frame(ID = c(1, 2, 4), Age = c(25, 30, 22))
+
+# Fusionner les deux tables sur la colonne "ID"
+df_merge <- merge(df1, df2, by = "ID", all = TRUE)
+
+# Affichage du résultat
+print(df_merge)
+```
+
+### Explication :
+- `by = "ID"` : Spécifie que la fusion se fait sur la colonne `ID` présente dans les deux jeux de données.  
+- `all = TRUE` : Effectue une jointure externe (`outer join`), conservant toutes les lignes des deux data frames, même si elles ne correspondent pas parfaitement.  
+  - Si `all = FALSE` (par défaut), seuls les ID présents dans les deux tables sont conservés (`inner join`).  
+  - `all.x = TRUE` conserverait toutes les lignes de `df1`, et `all.y = TRUE` celles de `df2` (jointure gauche/droite).  
+  
+  
+# 8. Boucles et conditions
+
+```{r}
+for (i in 1:5) {
+  print(paste("Itération", i))  # Boucle for affichant les numéros d'itération
+  
+  if (i > 3) {
+    print("x est supérieur à 3")
+  } else {
+    print("x est inférieur ou égal à 3")
+  }
+}
+
+```
+
+# 9. Fonctions personnalisées
+
+Une fonction permet d'exécuter un bloc de code réutilisable.
+
+```{r}
+carre <- function(n) {
+  return(n^2)  # Fonction qui renvoie le carré d'un nombre
+}
+print(carre(4))  # Appel de la fonction
+```
+
+# 10. Visualisation avec ggplot2
+
+```{r}
+install.packages("ggplot2")  # Installer ggplot2 si nécessaire
+library(ggplot2)  # Charger la bibliothèque
+
+ggplot(data, aes(x = mpg, y = hp)) +  # Création d'un graphique avec mpg en x et hp en y
+  geom_point(color = "blue", size = 3) +  # Ajout de points en bleu
+  geom_smooth(method = "lm", se = FALSE, color = "red") +  # Ajout d'une droite de régression
+  labs(title = "Relation entre MPG et HP", x = "Miles par gallon", y = "Chevaux-vapeur") +  # Titres et légendes
+  theme_minimal()  # Application d'un thème minimaliste
+```
+
+# 11. Exportation de données
+
+```{r}
+write.csv(df, "data_export.csv", row.names = FALSE)  # Sauvegarde du data frame sous format CSV
+print("Données exportées en CSV")  # Message de confirmation
+```
